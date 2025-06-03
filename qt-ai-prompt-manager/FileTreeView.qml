@@ -10,8 +10,8 @@ ListView {
     signal fileClicked(string relativePath)
     
     ScrollBar.vertical: ScrollBar {
-        active: true
         policy: ScrollBar.AsNeeded
+        active: true
         
         background: Rectangle {
             color: "#2d2d30"

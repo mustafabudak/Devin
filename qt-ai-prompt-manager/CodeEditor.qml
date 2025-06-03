@@ -16,10 +16,8 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 4
         
-        ScrollBar.horizontal.policy: ScrollBar.AsNeeded
-        ScrollBar.vertical.policy: ScrollBar.AsNeeded
-        
-        ScrollBar.vertical: ScrollBar {
+        ScrollBar.horizontal: ScrollBar {
+            policy: ScrollBar.AsNeeded
             active: true
             
             background: Rectangle {
@@ -34,7 +32,8 @@ Rectangle {
             }
         }
         
-        ScrollBar.horizontal: ScrollBar {
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AsNeeded
             active: true
             
             background: Rectangle {
