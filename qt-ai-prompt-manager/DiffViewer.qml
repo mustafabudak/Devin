@@ -7,9 +7,9 @@ Rectangle {
     color: "#1e1e1e"
     
     property alias project1Path: fileTree1.projectPath
-    property alias project2Path: fileTree2.projectPath
+    property alias project2Path: fileTree1.projectPath
     property alias fileTree1Model: fileTree1.model
-    property alias fileTree2Model: fileTree2.model
+    property alias fileTree2Model: fileTree1.model
     property alias currentFile1Content: codeEditor1.content
     property alias currentFile2Content: codeEditor2.content
     property alias diffLines: codeEditor1.diffLines
