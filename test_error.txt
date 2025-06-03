@@ -1,5 +1,0 @@
-main.cpp:15:5: error: 'cout' was not declared in this scope
-main.cpp:15:5: note: suggested alternative: 'count'
-main.cpp:16:1: error: 'endl' was not declared in this scope
-main.cpp:20:10: warning: unused variable 'x' [-Wunused-variable]
-test.h:25:12: error: expected ';' before 'MyClass'
