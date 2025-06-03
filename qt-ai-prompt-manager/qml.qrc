@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>DiffViewer.qml</file>
+        <file>FileTreeView.qml</file>
+        <file>CodeEditor.qml</file>
     </qresource>
 </RCC>

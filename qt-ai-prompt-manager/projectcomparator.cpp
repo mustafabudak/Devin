@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QProcess>
 #include <QRegularExpression>
+#include <QFileInfo>
 
 ProjectComparator::ProjectComparator(QObject *parent)
     : QObject(parent)
@@ -16,6 +17,31 @@ QString ProjectComparator::comparisonResult() const
     return m_comparisonResult;
 }
 
+QVariantList ProjectComparator::fileTree1() const
+{
+    return m_fileTree1;
+}
+
+QVariantList ProjectComparator::fileTree2() const
+{
+    return m_fileTree2;
+}
+
+QString ProjectComparator::currentFile1Content() const
+{
+    return m_currentFile1Content;
+}
+
+QString ProjectComparator::currentFile2Content() const
+{
+    return m_currentFile2Content;
+}
+
+QVariantList ProjectComparator::diffLines() const
+{
+    return m_diffLines;
+}
+
 void ProjectComparator::compareProjects(const QString &project1Path, const QString &project2Path)
 {
     QDir dir1(project1Path);
@@ -25,6 +51,12 @@ void ProjectComparator::compareProjects(const QString &project1Path, const QStri
         emit errorOccurred("One or both project directories do not exist.");
         return;
     }
+    
+    m_project1Path = project1Path;
+    m_project2Path = project2Path;
+    
+    m_fileTree1 = buildFileTree(project1Path);
+    m_fileTree2 = buildFileTree(project2Path);
     
     QStringList files1 = getProjectFiles(project1Path);
     QStringList files2 = getProjectFiles(project2Path);
@@ -64,6 +96,8 @@ void ProjectComparator::compareProjects(const QString &project1Path, const QStri
     
     m_comparisonResult = result;
     emit comparisonResultChanged();
+    emit fileTree1Changed();
+    emit fileTree2Changed();
 }
 
 QStringList ProjectComparator::getProjectFiles(const QString &projectPath)
@@ -136,6 +170,107 @@ QString ProjectComparator::generateDiffSummary(const QString &diff)
     }
     
     return summary;
+}
+
+void ProjectComparator::selectFile(const QString &relativePath)
+{
+    if (m_project1Path.isEmpty() || m_project2Path.isEmpty()) {
+        return;
+    }
+    
+    QString file1Path = m_project1Path + "/" + relativePath;
+    QString file2Path = m_project2Path + "/" + relativePath;
+    
+    m_currentFile1Content = getFileContent(file1Path);
+    m_currentFile2Content = getFileContent(file2Path);
+    
+    m_diffLines = generateLineDiff(m_currentFile1Content, m_currentFile2Content);
+    
+    emit currentFile1ContentChanged();
+    emit currentFile2ContentChanged();
+    emit diffLinesChanged();
+}
+
+QString ProjectComparator::getFileContent(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QString();
+    }
+    
+    QTextStream in(&file);
+    return in.readAll();
+}
+
+QVariantList ProjectComparator::buildFileTree(const QString &projectPath)
+{
+    QVariantList tree;
+    QDir dir(projectPath);
+    
+    QStringList nameFilters;
+    nameFilters << "*.cpp" << "*.h" << "*.qml" << "*.js" << "*.py" << "*.java" 
+                << "*.cs" << "*.php" << "*.rb" << "*.go" << "*.rs" << "*.swift"
+                << "*.kt" << "*.scala" << "*.ts" << "*.jsx" << "*.tsx"
+                << "*.pro" << "*.pri" << "*.cmake" << "CMakeLists.txt"
+                << "*.json" << "*.xml" << "*.yaml" << "*.yml"
+                << "Makefile" << "*.mk" << "*.gradle";
+    
+    QDirIterator it(projectPath, nameFilters, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString filePath = it.next();
+        QString relativePath = dir.relativeFilePath(filePath);
+        QFileInfo fileInfo(filePath);
+        
+        QVariantMap fileNode = createFileNode(fileInfo.fileName(), relativePath, false);
+        tree.append(fileNode);
+    }
+    
+    return tree;
+}
+
+QVariantMap ProjectComparator::createFileNode(const QString &name, const QString &path, bool isDirectory)
+{
+    QVariantMap node;
+    node["name"] = name;
+    node["path"] = path;
+    node["isDirectory"] = isDirectory;
+    return node;
+}
+
+QVariantList ProjectComparator::generateLineDiff(const QString &content1, const QString &content2)
+{
+    QVariantList diffLines;
+    QStringList lines1 = content1.split('\n');
+    QStringList lines2 = content2.split('\n');
+    
+    int maxLines = qMax(lines1.size(), lines2.size());
+    
+    for (int i = 0; i < maxLines; ++i) {
+        QVariantMap lineData;
+        lineData["lineNumber"] = i + 1;
+        
+        QString line1 = (i < lines1.size()) ? lines1[i] : QString();
+        QString line2 = (i < lines2.size()) ? lines2[i] : QString();
+        
+        lineData["content1"] = line1;
+        lineData["content2"] = line2;
+        
+        if (line1 != line2) {
+            if (line1.isEmpty()) {
+                lineData["type"] = "added";
+            } else if (line2.isEmpty()) {
+                lineData["type"] = "removed";
+            } else {
+                lineData["type"] = "modified";
+            }
+        } else {
+            lineData["type"] = "unchanged";
+        }
+        
+        diffLines.append(lineData);
+    }
+    
+    return diffLines;
 }
 
 void ProjectComparator::generateComparisonPrompt()

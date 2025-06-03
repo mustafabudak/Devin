@@ -8,10 +8,11 @@ import CompilerErrorProcessor 1.0
 
 ApplicationWindow {
     id: window
-    width: 1200
-    height: 800
+    width: 1400
+    height: 900
     visible: true
     title: "AI Prompt Manager"
+    color: "#1e1e1e"
 
     PromptManager {
         id: promptManager
@@ -53,17 +54,67 @@ ApplicationWindow {
 
     header: TabBar {
         id: tabBar
+        background: Rectangle {
+            color: "#2d2d30"
+            border.color: "#3c3c3c"
+            border.width: 1
+        }
+        
         TabButton {
             text: "Prompt Manager"
+            background: Rectangle {
+                color: parent.checked ? "#094771" : "#2d2d30"
+                border.color: "#3c3c3c"
+                border.width: 1
+            }
+            contentItem: Text {
+                text: parent.text
+                color: "#cccccc"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
         }
         TabButton {
             text: "Compiler Errors"
+            background: Rectangle {
+                color: parent.checked ? "#094771" : "#2d2d30"
+                border.color: "#3c3c3c"
+                border.width: 1
+            }
+            contentItem: Text {
+                text: parent.text
+                color: "#cccccc"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
         }
         TabButton {
-            text: "Project Compare"
+            text: "Visual Diff Viewer"
+            background: Rectangle {
+                color: parent.checked ? "#094771" : "#2d2d30"
+                border.color: "#3c3c3c"
+                border.width: 1
+            }
+            contentItem: Text {
+                text: parent.text
+                color: "#cccccc"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
         }
         TabButton {
             text: "AI Response"
+            background: Rectangle {
+                color: parent.checked ? "#094771" : "#2d2d30"
+                border.color: "#3c3c3c"
+                border.width: 1
+            }
+            contentItem: Text {
+                text: parent.text
+                color: "#cccccc"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
         }
     }
 
@@ -224,81 +275,144 @@ ApplicationWindow {
         }
 
         // Project Compare Tab
-        Item {
+        Rectangle {
+            color: "#1e1e1e"
+            
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 20
+                spacing: 0
 
-                Label {
-                    text: "Project Comparison:"
-                    font.bold: true
-                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    color: "#2d2d30"
+                    border.color: "#3c3c3c"
+                    border.width: 1
 
-                RowLayout {
-                    Label {
-                        text: "Project 1:"
-                    }
-                    TextField {
-                        id: project1Field
-                        Layout.fillWidth: true
-                        placeholderText: "Path to first project..."
-                    }
-                    Button {
-                        text: "Browse"
-                        onClicked: {
-                            project1Dialog.folder = "file://" + project1Field.text
-                            project1Dialog.open()
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+
+                        Label {
+                            text: "Project 1:"
+                            color: "#cccccc"
+                            font.pixelSize: 12
+                        }
+                        TextField {
+                            id: project1Field
+                            Layout.preferredWidth: 200
+                            placeholderText: "Path to first project..."
+                            color: "#cccccc"
+                            background: Rectangle {
+                                color: "#3c3c3c"
+                                border.color: "#6c6c6c"
+                                border.width: 1
+                            }
+                        }
+                        Button {
+                            text: "Browse"
+                            background: Rectangle {
+                                color: "#0e639c"
+                                border.color: "#1177bb"
+                                border.width: 1
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                color: "#ffffff"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: {
+                                project1Dialog.folder = "file://" + project1Field.text
+                                project1Dialog.open()
+                            }
+                        }
+
+                        Label {
+                            text: "Project 2:"
+                            color: "#cccccc"
+                            font.pixelSize: 12
+                        }
+                        TextField {
+                            id: project2Field
+                            Layout.preferredWidth: 200
+                            placeholderText: "Path to second project..."
+                            color: "#cccccc"
+                            background: Rectangle {
+                                color: "#3c3c3c"
+                                border.color: "#6c6c6c"
+                                border.width: 1
+                            }
+                        }
+                        Button {
+                            text: "Browse"
+                            background: Rectangle {
+                                color: "#0e639c"
+                                border.color: "#1177bb"
+                                border.width: 1
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                color: "#ffffff"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: {
+                                project2Dialog.folder = "file://" + project2Field.text
+                                project2Dialog.open()
+                            }
+                        }
+
+                        Button {
+                            text: "Compare Projects"
+                            enabled: project1Field.text.length > 0 && project2Field.text.length > 0
+                            background: Rectangle {
+                                color: parent.enabled ? "#0e639c" : "#404040"
+                                border.color: parent.enabled ? "#1177bb" : "#606060"
+                                border.width: 1
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                color: parent.enabled ? "#ffffff" : "#808080"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: {
+                                projectComparator.compareProjects(project1Field.text, project2Field.text)
+                            }
+                        }
+
+                        Button {
+                            text: "Generate Analysis Prompt"
+                            enabled: projectComparator.comparisonResult.length > 0
+                            background: Rectangle {
+                                color: parent.enabled ? "#0e639c" : "#404040"
+                                border.color: parent.enabled ? "#1177bb" : "#606060"
+                                border.width: 1
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                color: parent.enabled ? "#ffffff" : "#808080"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: projectComparator.generateComparisonPrompt()
                         }
                     }
                 }
 
-                RowLayout {
-                    Label {
-                        text: "Project 2:"
-                    }
-                    TextField {
-                        id: project2Field
-                        Layout.fillWidth: true
-                        placeholderText: "Path to second project..."
-                    }
-                    Button {
-                        text: "Browse"
-                        onClicked: {
-                            project2Dialog.folder = "file://" + project2Field.text
-                            project2Dialog.open()
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Button {
-                        text: "Compare Projects"
-                        enabled: project1Field.text.length > 0 && project2Field.text.length > 0
-                        onClicked: {
-                            projectComparator.compareProjects(project1Field.text, project2Field.text)
-                        }
-                    }
-                    Button {
-                        text: "Generate Analysis Prompt"
-                        enabled: projectComparator.comparisonResult.length > 0
-                        onClicked: projectComparator.generateComparisonPrompt()
-                    }
-                }
-
-                Label {
-                    text: "Comparison Results:"
-                    font.bold: true
-                }
-
-                ScrollView {
+                DiffViewer {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    TextArea {
-                        text: projectComparator.comparisonResult
-                        readOnly: true
-                        wrapMode: TextArea.Wrap
-                        selectByMouse: true
-                        font.family: "Consolas, Monaco, monospace"
+                    fileTree1Model: projectComparator.fileTree1
+                    fileTree2Model: projectComparator.fileTree2
+                    currentFile1Content: projectComparator.currentFile1Content
+                    currentFile2Content: projectComparator.currentFile2Content
+                    diffLines: projectComparator.diffLines
+                    
+                    onFileSelected: {
+                        projectComparator.selectFile(relativePath)
                     }
                 }
             }
