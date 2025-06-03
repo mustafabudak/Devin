@@ -8,7 +8,7 @@ Makefile*
 .qmake.stash
 
 # Compiled application
-qt-ai-prompt-manager
+qt-ai-prompt-manager/qt-ai-prompt-manager
 
 # Qt Creator files
 *.pro.user
