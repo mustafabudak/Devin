@@ -1,0 +1,25 @@
+# Qt build files
+*.o
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+Makefile*
+.qmake.stash
+
+# Compiled application
+qt-ai-prompt-manager
+
+# Qt Creator files
+*.pro.user
+*.pro.user.*
+
+# Build directories
+build/
+debug/
+release/
+
+# Test files (keep for demonstration)
+# test_error.txt
+# test_project1/
+# test_project2/
