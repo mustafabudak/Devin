@@ -37,7 +37,7 @@ private:
     QString m_currentPrompt;
     QString m_simplifiedPrompt;
     QNetworkAccessManager *m_networkManager;
-    
+
     QString simplifyText(const QString &text);
     void sendToOpenAI(const QString &prompt, const QString &apiKey);
     void sendToClaude(const QString &prompt, const QString &apiKey);
