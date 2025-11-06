@@ -138,10 +138,25 @@ ApplicationWindow {
                     Layout.preferredHeight: 200
                     TextArea {
                         id: originalPromptArea
-                        text: promptManager.currentPrompt
-                        onTextChanged: promptManager.currentPrompt = text
                         wrapMode: TextArea.Wrap
                         placeholderText: "Enter your prompt here or load from file..."
+
+                        Connections {
+                            target: promptManager
+                            function onCurrentPromptChanged() {
+                                if (originalPromptArea.text !== promptManager.currentPrompt) {
+                                    var cursorPos = originalPromptArea.cursorPosition
+                                    originalPromptArea.text = promptManager.currentPrompt
+                                    originalPromptArea.cursorPosition = cursorPos
+                                }
+                            }
+                        }
+
+                        onTextChanged: {
+                            if (promptManager.currentPrompt !== text) {
+                                promptManager.currentPrompt = text
+                            }
+                        }
                     }
                 }
 
@@ -233,11 +248,26 @@ ApplicationWindow {
                     Layout.preferredHeight: 300
                     TextArea {
                         id: errorTextArea
-                        text: errorProcessor.errorText
-                        onTextChanged: errorProcessor.errorText = text
                         wrapMode: TextArea.Wrap
                         placeholderText: "Paste compiler error output here or load from file..."
                         font.family: "Consolas, Monaco, monospace"
+
+                        Connections {
+                            target: errorProcessor
+                            function onErrorTextChanged() {
+                                if (errorTextArea.text !== errorProcessor.errorText) {
+                                    var cursorPos = errorTextArea.cursorPosition
+                                    errorTextArea.text = errorProcessor.errorText
+                                    errorTextArea.cursorPosition = cursorPos
+                                }
+                            }
+                        }
+
+                        onTextChanged: {
+                            if (errorProcessor.errorText !== text) {
+                                errorProcessor.errorText = text
+                            }
+                        }
                     }
                 }
 
